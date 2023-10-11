@@ -1,0 +1,81 @@
+{"builders": [
+    {
+      "boot_command": [
+            "<up><wait><tab> inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": "{{user `disk_size`}}",
+      "export_opts": [
+        "--manifest",
+        "--vsys",
+        "0",
+        "--description",
+        "{{user `artifact_description`}}",
+        "--version",
+        "{{user `artifact_version`}}"
+      ],
+      "guest_os_type": "RedHat_64",
+      "headless": "{{ user `headless` }}",
+      "http_directory": "http",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_url": "{{user `iso_url`}}",
+      "name": "{{user `image_name`}}",
+      "output_directory": "builds",
+      "shutdown_command": "sudo -S /sbin/halt -h -p",
+      "shutdown_timeout": "5m",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_pty": true,
+      "ssh_timeout": "20m",
+      "ssh_username": "vagrant",
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "{{user `memory`}}"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "{{user `cpus`}}"
+        ]
+      ],
+      "vm_name": "packer-centos-vm"
+    }
+  ],
+  "post-processors": [
+    {
+      "compression_level": "{{user `compression_level`}}",
+      "output": "centos-{{user `artifact_version`}}-kernel-6-x86_64-Minimal.box",
+      "type": "vagrant"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "expect_disconnect": "true",
+      "scripts": [
+        "scripts/stage-1-kernel-update.sh",
+        "scripts/stage-2-clean.sh"
+      ],
+      "pause_before": "5s",
+      "start_retry_timeout": "1m"
+    }
+  ],
+  "variables": {
+    "compression_level": "7",
+    "artifact_description": "CentOS Stream 8 with kernel 6.x",
+    "artifact_version": "8",
+    "image_name": "centos-8",
+    "iso_checksum": "888e4afc9fc50050242c4e17ca10fbe28de3c966a496d962105f06e5719d31f3",
+    "iso_url": "http://mirror.linux-ia64.org/centos/8-stream/isos/x86_64/CentOS-Stream-8-x86_64-latest-boot.iso",
+    "cpus": "2",
+    "disk_size": "10240",
+    "memory": "1024",
+    "headless": "true"
+  }
+}
+
