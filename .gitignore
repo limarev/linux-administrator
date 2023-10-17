@@ -1,3 +1,4 @@
 # ignore vagrant files
 .vagrant
 *.box
+*.vdi
