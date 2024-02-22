@@ -1,0 +1,34 @@
+---
+# tasks file for ./provision/roles/spawn-fcgi
+
+- name: Install spawn-fcgi
+  ansible.builtin.package:
+    name: 
+      - spawn-fcgi
+      - php-cgi
+    state: present
+
+- name: "Copy spawn-fcgi to /etc/sysconfig"
+  ansible.builtin.copy:
+    src: ./spawn-fcgi
+    dest: /etc/sysconfig/
+    mode: '0644'
+
+- name: "Copy spawn-fcgi.service to /etc/systemd/system"
+  ansible.builtin.copy:
+    src: ./spawn-fcgi.service
+    dest: /etc/systemd/system
+    mode: '0644'
+
+- name: Start spawn-fcgi service
+  ansible.builtin.service:
+    name: spawn-fcgi
+    state: started
+
+- name: Collect facts about system services
+  ansible.builtin.service_facts:
+
+- name: Verify spawn-fcgi service is running
+  ansible.builtin.assert:
+    that:
+      - "ansible_facts.services['spawn-fcgi.service'].state == 'running'"

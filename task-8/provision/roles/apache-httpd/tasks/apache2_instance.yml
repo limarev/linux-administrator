@@ -1,0 +1,70 @@
+---
+# setup apache instance
+
+- name: "Setting up apache2-{{ item.key }} dir"
+  ansible.builtin.copy:
+    src: /etc/apache2/
+    dest: /etc/apache2-{{ item.key }}
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    remote_src: true
+
+- name: "Setting up /etc/logrotate.d/apache2-{{ item.key }}"
+  ansible.builtin.template:
+    src: logrotate.j2
+    dest: /etc/logrotate.d/apache2-{{ item.key }}
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
+- name: "Creates /var/log/apache2-{{ item.key }} directory"
+  ansible.builtin.file:
+    path: /var/log/apache2-{{ item.key }}
+    state: directory
+    owner: root
+    group: adm
+    mode: '0750'
+
+- name: "Setting up /etc/default/apache-htcacheclean-{{ item.key }} dir"
+  ansible.builtin.copy:
+    src: /etc/default/apache-htcacheclean
+    dest: /etc/default/apache-htcacheclean-{{ item.key }}
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    remote_src: true
+
+- name: Create a symbolic links
+  ansible.builtin.file:
+    src: /usr/sbin/{{ a2item }}
+    dest: /usr/local/sbin/{{ a2item }}-{{ item.key }}
+    owner: root
+    group: adm
+    state: link
+  loop:
+    - a2enmod
+    - a2dismod
+    - a2ensite
+    - a2dissite
+    - a2enconf
+    - a2disconf
+    - apache2ctl
+  loop_control:
+    loop_var: a2item
+
+- name: "Copy ports.conf"
+  ansible.builtin.template:
+    src: ports.conf.j2
+    dest: /etc/apache2-{{ item.key }}/ports.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
+- name: "Copy 000-default.conf"
+  ansible.builtin.template:
+    src: 000-default.conf.j2
+    dest: /etc/apache2-{{ item.key }}/sites-enabled/000-default.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r

@@ -1,4 +1,5 @@
 # ignore vagrant files
 .vagrant
+.vscode
 *.box
 *.vdi

@@ -1,0 +1,6 @@
+---
+# defaults file for provision/roles/apache-httpd
+
+instances:
+  first: 81
+  second: 82

@@ -1,0 +1,36 @@
+---
+# tasks file for provision/roles/apache-httpd
+
+- name: Install apache-httpd
+  ansible.builtin.package:
+    name:
+      - apache2
+      - libapache2-mod-php7.4
+    state: present
+
+- name: Setup apache2 instances
+  include_tasks: apache2_instance.yml
+  loop: "{{ instances | dict2items }}"
+
+- name: "Copy apache-httpd@.service to /etc/systemd/system"
+  ansible.builtin.copy:
+    src: apache-httpd@.service
+    dest: /etc/systemd/system
+    mode: '0644'
+
+- name: Run apache2 instances
+  ansible.builtin.systemd_service:
+    state: started
+    name: apache-httpd@{{ item.key }}
+  loop: "{{ instances | dict2items }}"
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Check if apache-httpd@{{ item.key }}.service is running
+  ansible.builtin.assert:
+    that:
+      - "ansible_facts.services['apache-httpd@{{ item.key }}.service'].state == 'running'"
+    success_msg: "OK: apache-httpd@{{ item.key }}.service is running"
+    fail_msg: "NOK: apache-httpd@{{ item.key }}.service is not running"
+  loop: "{{ instances | dict2items }}"

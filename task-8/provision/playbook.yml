@@ -1,0 +1,12 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: true
+  vars:
+    instances:
+      first: 81
+      second: 82
+  roles:
+    - watchlog
+    - spawn-fcgi
+    - apache-httpd

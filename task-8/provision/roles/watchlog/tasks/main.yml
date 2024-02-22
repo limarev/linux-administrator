@@ -1,0 +1,49 @@
+---
+- name: "Copy watchlog to /etc/sysconfig"
+  ansible.builtin.copy:
+    src: ./watchlog
+    dest: /etc/sysconfig/
+    mode: '0644'
+
+- name: "Copy watchlog.log to /var/log"
+  ansible.builtin.copy:
+    src: ./watchlog.log
+    dest: /var/log
+    mode: '0644'
+
+- name: "Copy watchlog.sh to /opt"
+  ansible.builtin.copy:
+    src: ./watchlog.sh
+    dest: /opt
+    mode: '0744'
+
+- name: "Copy watchlog.service to /etc/systemd/system"
+  ansible.builtin.copy:
+    src: ./watchlog.service
+    dest: /etc/systemd/system
+    mode: '0644'
+
+- name: "Copy watchlog.timer to /etc/systemd/system"
+  ansible.builtin.copy:
+    src: ./watchlog.timer
+    dest: /etc/systemd/system
+    mode: '0644'
+
+- name: Start timer
+  ansible.builtin.command: "systemctl start watchlog.timer"
+  register: timer
+
+- name: Start watchlog service
+  ansible.builtin.service:
+    name: watchlog
+    state: started
+
+- name: Wait for service to log some messages
+  ansible.builtin.pause:
+    seconds: 60
+
+- name: Get watchlog logs
+  ansible.builtin.command: "journalctl -eu watchlog"
+  register: watchlog
+
+- ansible.builtin.debug: msg="{{ watchlog.stdout }}"
