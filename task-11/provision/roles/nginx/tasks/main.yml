@@ -1,0 +1,27 @@
+---
+# tasks file for nginx
+
+- name: Install nginx package
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+  notify:
+    - restart nginx
+
+- name: Create NGINX config file from template
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: 0644
+  notify:
+    - reload nginx
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Validate nginx server
+  ansible.builtin.assert:
+    that:
+      - "ansible_facts.services['nginx'].state == 'running'"
+    success_msg: "OK: nginx.service is running"
+    fail_msg: "NOK: nginx.service is not running"

@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: true
+  vars:
+    listen_port: 8080
+  roles:
+    - nginx
