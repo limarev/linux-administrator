@@ -4,3 +4,4 @@ Tasks for OTUS linux administrator course.
 - [x] task-2 - Работа с mdadm
 - [x] task-8 - Systemd - создание unit-файла
 - [ ] task-11 - Первые шаги с Ansible
+- [ ] task-13 - Docker, docker-compose, dockerfile
