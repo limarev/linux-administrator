@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+    config.vm.box = "generic/ubuntu2204"
+    config.vm.synced_folder ".", "/vagrant", disabled: false
+    config.vm.network "forwarded_port", guest: 80, host: 8086
+
+    # config.vm.network "private_network", ip: "192.168.56.10"
+
+    config.vm.provision "ansible_local" do |ansible|
+      ansible.playbook = "provision/playbook.yml"
+      ansible.galaxy_role_file = "provision/requirements.yml"
+      # ansible.galaxy_roles_path = "/home/vagrant/.ansible/roles/"
+      ansible.verbose = true
+    end
+  end
+  

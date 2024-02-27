@@ -1,0 +1,32 @@
+---
+- name: Deploy common exporters
+  hosts: all
+  roles:
+    - prometheus.prometheus.node_exporter
+  tags:
+    - exporters
+
+- name: Setup core monitoring software
+  hosts: all
+  # vars:
+  #   prometheus_targets:
+  #     node:
+  #     - targets:
+  #       - localhost:9100
+  roles:
+    # - prometheus.prometheus.blackbox_exporter
+    - prometheus.prometheus.prometheus
+    # - prometheus.prometheus.alertmanager
+  tags:
+    - prometheus
+
+- name: Deploy grafana
+  hosts: all
+  roles:
+    - role: grafana.grafana.grafana
+      vars:
+        grafana_security:
+          admin_user: admin
+          admin_password: admin
+  tags:
+    - grafana
